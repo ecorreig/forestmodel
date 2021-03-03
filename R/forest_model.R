@@ -195,6 +195,22 @@ forest_model <- function(model,
         coalesce(variable)
     )
 
+    extract_surv <- function(data) {
+      if ("time" %in% colnames(data[, 1])) {
+        return(bind_cols(
+          data[,-1, drop = FALSE],
+          .event_time = data[, 1][, "time"],
+          .event_status = data[, 1][, "status"]
+        ))
+      } else {
+        return(bind_cols(
+          data[,-1, drop = FALSE],
+          .event_time =  as.numeric(data[, 1][, "stop"]),
+          .event_status = data[, 1][, "status"]
+        ))
+      }
+    }
+
     create_term_data <- function(term_row) {
       if (!is.na(term_row$class)) {
         var <- term_row$variable
@@ -215,10 +231,7 @@ forest_model <- function(model,
               out <- bind_rows(tibble::as_tibble(term_row), out)
             }
             if (inherits(model, "coxph")) {
-              data_event <- bind_cols(data[, -1, drop = FALSE],
-                .event_time = data[, 1][, "time"],
-                .event_status = data[, 1][, "status"]
-              )
+              data_event <- extract_surv(data)
               event_detail_tab <- data_event %>%
                 group_by(!!as.name(var)) %>%
                 summarise(
