@@ -322,6 +322,10 @@ forest_model <- function(model,
       filter(!is.na(std.error))
   }
 
+  # Remove open accents from names
+  forest_terms <- forest_terms %>%
+    mutate(across(is.character, function(x) stringr::str_replace_all(x, "`", "")))
+
   plot_data <- list(
     forest_data = forest_terms,
     mapping = mapping,
