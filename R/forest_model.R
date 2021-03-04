@@ -322,7 +322,6 @@ forest_model <- function(model,
       mutate(variable = term_label) %>%
       filter(!is.na(std.error))
   }
-  print(forest_terms)
 
   if (hide_yes) {
     forest_terms <- forest_terms %>%
