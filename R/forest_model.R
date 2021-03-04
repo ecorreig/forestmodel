@@ -25,6 +25,7 @@
 #'   that go to positive or negative infinity from plotting. They will still be
 #'   displayed as text. Defaults to \code{TRUE}, since otherwise plot is malformed
 #' @param hide_ref if `TRUE` the reference level is not shown.
+#' @param hide_yes if `TRUE` the "Yes" or "yes" values from the levels are droped.
 #'
 #' @return A ggplot ready for display or saving, or (with \code{return_data == TRUE},
 #'   a \code{list} with the parameters to call \code{\link{panel_forest_plot}} in the
@@ -130,7 +131,7 @@ forest_model <- function(model,
                          limits = NULL, breaks = NULL, return_data = FALSE,
                          recalculate_width = TRUE, recalculate_height = TRUE,
                          model_list = NULL, merge_models = FALSE, exclude_infinite_cis = TRUE,
-                         hide_ref = FALSE) {
+                         hide_ref = FALSE, hide_yes=FALSE) {
   mapping <- aes(estimate, xmin = conf.low, xmax = conf.high)
   if (!is.null(model_list)) {
     if (!is.list(model_list)) {
@@ -320,6 +321,15 @@ forest_model <- function(model,
     forest_terms <- forest_terms %>%
       mutate(variable = term_label) %>%
       filter(!is.na(std.error))
+  }
+  print(forest_terms)
+
+  if (hide_yes) {
+    forest_terms <- forest_terms %>%
+      mutate(
+        level = stringr::str_replace_all(level, "Yes", ""),
+        level = stringr::str_replace_all(level, "yes", "")
+        )
   }
 
   # Remove open accents from names
