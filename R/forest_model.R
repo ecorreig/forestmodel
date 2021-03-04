@@ -24,6 +24,7 @@
 #' @param exclude_infinite_cis whether to exclude points and confidence intervals
 #'   that go to positive or negative infinity from plotting. They will still be
 #'   displayed as text. Defaults to \code{TRUE}, since otherwise plot is malformed
+#' @param hide_ref if `TRUE` the reference level is not shown.
 #'
 #' @return A ggplot ready for display or saving, or (with \code{return_data == TRUE},
 #'   a \code{list} with the parameters to call \code{\link{panel_forest_plot}} in the
@@ -128,7 +129,8 @@ forest_model <- function(model,
                          theme = theme_forest(),
                          limits = NULL, breaks = NULL, return_data = FALSE,
                          recalculate_width = TRUE, recalculate_height = TRUE,
-                         model_list = NULL, merge_models = FALSE, exclude_infinite_cis = TRUE) {
+                         model_list = NULL, merge_models = FALSE, exclude_infinite_cis = TRUE,
+                         hide_ref = FALSE) {
   mapping <- aes(estimate, xmin = conf.low, xmax = conf.high)
   if (!is.null(model_list)) {
     if (!is.list(model_list)) {
@@ -314,7 +316,11 @@ forest_model <- function(model,
       )
   }
 
-
+  if (hide_ref) {
+    forest_terms <- forest_terms %>%
+      mutate(variable = term_label) %>%
+      filter(!is.na(std.error))
+  }
 
   plot_data <- list(
     forest_data = forest_terms,
