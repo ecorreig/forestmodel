@@ -216,7 +216,7 @@ forest_model <- function(model,
 
     create_term_data <- function(term_row) {
 
-      if (`(cluster)` %in% names(data)) {
+      if ("`(cluster)`" %in% names(data)) {
         unique_data <- data %>% distinct(`(cluster)`, .keep_all = T)
       } else {
         unique_data <- data
