@@ -215,10 +215,17 @@ forest_model <- function(model,
     }
 
     create_term_data <- function(term_row) {
+
+      if (`(cluster)` %in% names(data)) {
+        unique_data <- data %>% distinct(`(cluster)`, .keep_all = T)
+      } else {
+        unique_data <- data
+      }
+
       if (!is.na(term_row$class)) {
         var <- term_row$variable
         if (term_row$class %in% c("factor", "character")) {
-          tab <- table(data[, var])
+          tab <- table(unique_data[, var])
           if (!any(paste0(term_row$term_label, names(tab)) %in% tidy_model$term)) {
             # Filter out terms not in final model summary (e.g. strata)
             out <- tibble::tibble(variable = NA)
@@ -234,7 +241,7 @@ forest_model <- function(model,
               out <- bind_rows(tibble::as_tibble(term_row), out)
             }
             if (inherits(model, "coxph")) {
-              data_event <- extract_surv(data)
+              data_event <- extract_surv(unique_data)
               event_detail_tab <- data_event %>%
                 group_by(!!as.name(var)) %>%
                 summarise(
@@ -248,7 +255,7 @@ forest_model <- function(model,
           }
         } else {
           out <- data.frame(term_row,
-            level = NA, level_no = NA, n = sum(!is.na(data[, var])),
+            level = NA, level_no = NA, n = sum(!is.na(unique_data[, var])),
             stringsAsFactors = FALSE
           )
           if (term_row$class == "logical") {
