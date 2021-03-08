@@ -218,6 +218,8 @@ forest_model <- function(model,
 
       if ("(cluster)" %in% names(data)) {
         unique_data <- data %>% distinct(`(cluster)`, .keep_all = T)
+      } else if ("id" %in% names(data)) {
+        unique_data <- data %>% distinct(`(cluster)`, .keep_all = T)
       } else {
         unique_data <- data
       }
