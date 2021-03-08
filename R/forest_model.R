@@ -219,7 +219,7 @@ forest_model <- function(model,
       if ("(cluster)" %in% names(data)) {
         unique_data <- data[!duplicated(data$`(cluster)`), ]
       } else if ("id" %in% names(data)) {
-        unique_data <- data[!duplicated(data$is), ]
+        unique_data <- data[!duplicated(data$id), ]
       } else {
         unique_data <- data
       }
